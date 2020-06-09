@@ -23,6 +23,9 @@ public class MainActivity extends AppCompatActivity {
      */
     private static final String FILENAME = "MainActivity.java";
     private static final String TAG = "Whack-A-Mole3.0!";
+    private TextView newUser;
+    private Button loginButton;
+    MyDBHandler dbHandler = new MyDBHandler(this,null,null,1);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +41,42 @@ public class MainActivity extends AppCompatActivity {
             Log.v(TAG, FILENAME + ": Invalid user!");
 
         */
+        final EditText etUsername = findViewById(R.id.etUsername);
+        final EditText etPassword = findViewById(R.id.etPassword);
+        newUser = findViewById(R.id.tvNewUser);
+        loginButton = findViewById(R.id.btnLogin);
+        newUser.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Intent intent = new Intent(MainActivity.this, Main2Activity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(intent);
+                return false;
+            }
 
+
+        });
+        loginButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+
+                Log.v(TAG, FILENAME + ": Login with info: " + etUsername.getText().toString());
+                Log.v(TAG, FILENAME + ": Login with info: " + etPassword.getText().toString());
+
+                if(isValidUser(etUsername.getText().toString(), etPassword.getText().toString())){
+                    Intent intent = new Intent(MainActivity.this, Main3Activity.class);
+                    intent.putExtra("username", etUsername.getText().toString());
+                    startActivity(intent);
+                    Toast.makeText(MainActivity.this,"Valid", Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    Toast.makeText(MainActivity.this, "Invalid Username / Password", Toast.LENGTH_SHORT).show();
+                }
+                return false;
+
+            }
+        });
 
     }
 
@@ -54,6 +92,20 @@ public class MainActivity extends AppCompatActivity {
             Log.v(TAG, FILENAME + ": Running Checks..." + dbData.getMyUserName() + ": " + dbData.getMyPassword() +" <--> "+ userName + " " + password);
             You may choose to use this or modify to suit your design.
          */
+        UserData dbData = dbHandler.findUser(userName);
+        if (dbData != null) {
+
+            Log.v(TAG, FILENAME + ": Running checks..." + dbData.getMyUserName() + "| " + dbData.getMyPassword());
+
+            if (dbData.getMyUserName().equals(userName) && dbData.getMyPassword().equals(password)) {
+                return true;
+            }
+            return false;
+
+
+        } else {
+            return false;
+        }
 
     }
 
